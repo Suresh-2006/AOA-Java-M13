@@ -1,36 +1,42 @@
 
-# EX 3D Sudoku solver - Backtracking.
+# EX 3B Rat in Maze- Backtracking 
 ## DATE : 01/05/2026
 ## AIM:
-To write a Java program to solve a Sudoku puzzle by filling the empty cells.
+To write a Java program to for given constraints.
+here is a ball in a maze with empty spaces (represented as 0) and walls (represented as 1). The ball can go through the empty spaces by rolling up, down, left or right, but it won't stop rolling until hitting a wall. When the ball stops, it could choose the next direction.
 
-For example:
-<img width="357" height="322" alt="image" src="https://github.com/user-attachments/assets/334b8c39-d547-4743-aca0-de92e38bdd1c" />
+Given the m x n maze, the ball's start position and the destination, where start = [startrow, startcol] and destination = [destinationrow, destinationcol], return true if the ball can stop at the destination, otherwise return false.
 
+You may assume that the borders of the maze are all walls (see examples).
+<img width="573" height="573" alt="image" src="https://github.com/user-attachments/assets/d6f1c054-cdc2-4bb3-9c55-512fb2cf0fb7" />
+Input: maze = [[0,0,1,0,0],[0,0,0,0,0],[0,0,0,1,0],[1,1,0,1,1],[0,0,0,0,0]], start = [0,4], destination = [4,4]
+Output: true
+Explanation: One possible way is : left -> down -> left -> down -> right -> down -> right.
 
 
 ## Algorithm
 1. Start  
-2. Read a 9×9 Sudoku board as input, where empty cells are represented by `0`.  
-3. Define a function `isSafe(board, row, col, num)` that checks if a number `num` can be placed at position `(row, col)` without violating Sudoku rules:  
-   - The number should not already exist in the same row.  
-   - The number should not already exist in the same column.  
-   - The number should not already exist in the same 3×3 subgrid.  
-4. Define a recursive function `solveSudoku(board, row, col)` to fill the board:  
-   - If `row == 9`, all rows are filled → return `true` (solution found).  
-   - If `col == 9`, move to the next row by calling `solveSudoku(board, row + 1, 0)`.  
-   - If the current cell is already filled (`board[row][col] != 0`), move to the next column.  
-5. For an empty cell `(row, col)`:  
-   - Try placing numbers `1` to `9` one by one.  
-   - For each number, check if it is safe using `isSafe()`.  
-   - If safe, place the number and recursively call `solveSudoku(board, row, col + 1)`.  
-   - If the recursive call returns `true`, a valid solution is found → return `true`.  
-   - Otherwise, reset the cell to `0` (backtrack) and try the next number.  
-6. If no valid number can be placed, return `false` to backtrack further.  
-7. If the function returns `true`, print the solved Sudoku board.  
-8. If the function returns `false`, print "No solution exists."  
+2. Read the dimensions of the maze: `m` (rows) and `n` (columns).  
+3. Read the maze as a 2D grid of size `m × n`, where:  
+   - `0` represents an open path  
+   - `1` represents a wall  
+4. Read the starting position `start[]` and the destination position `destination[]`.  
+5. Initialize a 2D boolean array `visit[m][n]` to track visited cells.  
+6. Define a recursive function `dfs(m, n, maze, curr, destination, visit)` that:  
+   - Returns `false` if the current cell is already visited.  
+   - Returns `true` if the current cell equals the destination cell.  
+   - Marks the current cell as visited.  
+   - Defines four movement directions: up, down, left, right.  
+   - For each direction:  
+     - Move continuously (roll) in that direction until hitting a wall (`1`) or the boundary of the maze.  
+     - Once stopped, recursively call `dfs()` from the stopping position.  
+     - If any recursive call returns `true`, propagate success upward.  
+7. In the `hasPath()` function:  
+   - Initialize parameters and call the DFS function from the starting position.  
+   - Return `true` if the destination can be reached, otherwise `false`.  
+8. Print the result.  
 9. End  
-  
+   
 
 ## Program:
 ```
@@ -38,83 +44,77 @@ For example:
 Developed by: DHINESH R
 Register Number:  212223220019
 */
-import java.util.Scanner;
+import java.util.*;
 
-public class SudokuSolver {
-
-    static boolean isSafe(int[][] board, int row, int col, int num) {
-        for (int i = 0; i < 9; i++) {
-            if (board[row][i] == num || board[i][col] == num)
-                return false;
-        }
-
-        int startRow = row - row % 3;
-        int startCol = col - col % 3;
-
-        for (int i = 0; i < 3; i++)
-            for (int j = 0; j < 3; j++)
-                if (board[startRow + i][startCol + j] == num)
-                    return false;
-
-        return true;
-    }
-
-    static boolean solveSudoku(int[][] board, int row, int col) {
-        if (row == 9)
-            return true;
-
-        if (col == 9)
-            return solveSudoku(board, row + 1, 0);
-
-        if (board[row][col] != 0)
-            return solveSudoku(board, row, col + 1);
-
-        for (int num = 1; num <= 9; num++) {
-            if (isSafe(board, row, col, num)) {
-                board[row][col] = num;
-                if (solveSudoku(board, row, col + 1))
-                    return true;
-                board[row][col] = 0; // backtrack
-            }
-        }
-        return false;
-    }
-
-    static void printBoard(int[][] board) {
-        for (int[] row : board) {
-            for (int val : row)
-                System.out.print(val + " ");
-            System.out.println();
-        }
-    }
+public class Main {
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        int[][] board = new int[9][9];
 
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
-                board[i][j] = sc.nextInt();
+        int m = sc.nextInt();
+        int n = sc.nextInt();
+
+        int[][] maze = new int[m][n];
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                maze[i][j] = sc.nextInt();
             }
         }
 
-        if (solveSudoku(board, 0, 0)) {
-            System.out.println("Solved Sudoku:");
-            printBoard(board);
-        } else {
-            System.out.println("No solution exists.");
+        int[] start = new int[]{sc.nextInt(), sc.nextInt()};
+        int[] destination = new int[]{sc.nextInt(), sc.nextInt()};
+
+        Solution sol = new Solution();
+        boolean result = sol.hasPath(maze, start, destination);
+
+        System.out.println(result);
+    }
+}
+
+class Solution {
+
+    public boolean dfs(int m, int n, int[][] maze, int[] curr, int[] destination, boolean[][] visit) {
+        if (visit[curr[0]][curr[1]]) return false;
+        if (curr[0] == destination[0] && curr[1] == destination[1]) return true;
+        visit[curr[0]][curr[1]] = true;
+
+        int[][] dirs = {{1,0},{-1,0},{0,1},{0,-1}};
+
+        for (int[] dir : dirs) {
+            int x = curr[0];
+            int y = curr[1];
+
+            // roll until hitting a wall
+            while (x + dir[0] >= 0 && x + dir[0] < m &&
+                   y + dir[1] >= 0 && y + dir[1] < n &&
+                   maze[x + dir[0]][y + dir[1]] == 0) {
+                x += dir[0];
+                y += dir[1];
+            }
+
+            if (dfs(m, n, maze, new int[]{x, y}, destination, visit)) {
+                return true;
+            }
         }
 
-        sc.close();
+        return false;
+    }
+
+    public boolean hasPath(int[][] maze, int[] start, int[] destination) {
+        int m = maze.length;
+        int n = maze[0].length;
+        boolean[][] visit = new boolean[m][n];
+        return dfs(m, n, maze, start, destination, visit);
     }
 }
 
 ```
 
 ## Output:
+<img width="896" height="600" alt="image" src="https://github.com/user-attachments/assets/c5055299-923b-476d-a5df-4251b351c08f" />
 
-<img width="1029" height="658" alt="image" src="https://github.com/user-attachments/assets/8835bd6c-b7b9-4d14-bdb9-2c30c03e7cb0" />
 
 
 ## Result:
 The program successfully implemented and the expected output is verified.
+
