@@ -44,8 +44,8 @@ If there is no solution to the problem  print  "Solution does not exist"
 ```
 /*
 
-Developed by: DHINESH R
-Register Number:  212223220019
+Developed by: SURESH S
+Register Number:  212223040215
 */
 import java.util.Scanner;
 
